@@ -4,26 +4,82 @@ const {
     CloudinaryStorage
 } = require('multer-storage-cloudinary');
 
-const cloudinary = require('../config/cloudinary');
+const cloudinary =
+    require('../config/cloudinary');
 
 
-// cloudinary storage config
-const storage = new CloudinaryStorage({
+// -------------------
+// CLOUDINARY STORAGE
+// -------------------
 
-    cloudinary,
+const imageStorage =
+    new CloudinaryStorage({
 
-    params: {
+        cloudinary,
 
-        folder: 'backend_uploads',
+        params: {
 
-        allowed_formats: ['jpg', 'png', 'jpeg']
+            folder: 'backend_uploads',
 
-    }
+            allowed_formats: [
+                'jpg',
+                'png',
+                'jpeg'
+            ]
 
-});
+        }
+
+    });
 
 
-// multer setup
-const upload = multer({ storage });
+// image upload middleware
+const imageUpload =
+    multer({
 
-module.exports = upload;
+        storage: imageStorage
+
+    });
+
+
+// -------------------
+// CSV/XLSX STORAGE
+// -------------------
+
+const fileStorage =
+    multer.diskStorage({
+
+        destination: (req, file, cb) => {
+
+            cb(null, 'uploads/');
+        },
+
+        filename: (req, file, cb) => {
+
+            cb(
+                null,
+
+                Date.now() + '-' +
+                file.originalname
+            );
+        }
+
+    });
+
+
+// csv/xlsx upload middleware
+const fileUpload =
+    multer({
+
+        storage: fileStorage
+    });
+console.log("FILE UPLOAD =>", fileUpload);
+
+
+// exports
+module.exports = {
+
+    imageUpload,
+
+    fileUpload
+
+};
